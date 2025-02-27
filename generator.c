@@ -33,7 +33,7 @@ char* read_file(const char* filename)
     return string;
 }
 
-void write_sequence_to_file(const char* filename, unsigned int* sequence, size_t sequence_len)
+void write_sequence_to_file(const char* filename, unsigned int* sequence, unsigned int sequence_len)
 {
     int written = 0;
     FILE *f;
@@ -46,7 +46,7 @@ void write_sequence_to_file(const char* filename, unsigned int* sequence, size_t
         printf("Can't open file to write");
         return;
     }
-    written = fwrite(sequence, sizeof(unsigned int), sequence_len, f);
+    written = fwrite(sequence, sizeof(*sequence), sequence_len, f);
     if (written == 0) {
         printf("Error during writing to file !");
     }

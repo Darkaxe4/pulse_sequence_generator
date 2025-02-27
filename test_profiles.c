@@ -18,7 +18,7 @@ enum TestProfile parse_profile(const char* str_profile)
 unsigned int *default_generator(unsigned int total_pulses, unsigned long long frequency)
 {
     unsigned int* result;
-    result = calloc(sizeof(*result), total_pulses);
+    result = calloc(total_pulses, sizeof(*result));
     result[0] = zero_pulse(frequency);
     result[1] = one_pulse(frequency);
     for (unsigned int i = 2u; i < total_pulses; i++)
@@ -32,7 +32,7 @@ unsigned int *default_generator(unsigned int total_pulses, unsigned long long fr
 unsigned int *pae_generator(unsigned int total_pulses, unsigned long long frequency)
 {
     unsigned int* result = default_generator(total_pulses, frequency);
-    result[10 + rand() % total_pulses] = result[total_pulses];
+    result[10 + rand() % (total_pulses - 10)] = result[total_pulses];
     result[total_pulses] = result[rand() % 2];
     return result;
 }
@@ -40,7 +40,7 @@ unsigned int *pae_generator(unsigned int total_pulses, unsigned long long freque
 unsigned int *tsp_generator(unsigned int total_pulses, unsigned long long frequency)
 {
     unsigned int* result;
-    result = calloc(sizeof(*result), total_pulses);
+    result = calloc(total_pulses, sizeof(*result));
     result[0] = zero_pulse(frequency);
     result[1] = one_pulse(frequency);
     result[2] = too_short_pulse(frequency);
@@ -55,7 +55,7 @@ unsigned int *tsp_generator(unsigned int total_pulses, unsigned long long freque
 unsigned int *all_generator(unsigned int total_pulses, unsigned long long frequency)
 {
     unsigned int* result= tsp_generator(total_pulses, frequency);
-    result[10 + rand() % total_pulses] = result[total_pulses];
+    result[10 + rand() % (total_pulses - 10)] = result[total_pulses];
     result[total_pulses] = result[rand() % 2];
     return result;
 }
