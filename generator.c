@@ -6,9 +6,9 @@
 #include"external_dependencies/cJSON.h"
 #include"test_profiles.h"
 
-unsigned int* (*funcs[4])(unsigned int, unsigned long long) = {&default_generator, &pae_generator, &tsp_generator, &all_generator};
+USHORT* (*funcs[4])(unsigned int) = {&default_generator, &pae_generator, &tsp_generator, &all_generator};
 
-unsigned int* generate_sequence(const char* test_profile, unsigned int total_pulses, unsigned long long frequency);
+USHORT* generate_sequence(const char* test_profile, unsigned int total_pulses);
 
 char* read_file(const char* filename)
 {
@@ -33,7 +33,7 @@ char* read_file(const char* filename)
     return string;
 }
 
-void write_sequence_to_file(const char* filename, unsigned int* sequence, unsigned int sequence_len)
+void write_sequence_to_file(const char* filename, USHORT* sequence, unsigned int sequence_len)
 {
     int written = 0;
     FILE *f;
@@ -46,9 +46,9 @@ void write_sequence_to_file(const char* filename, unsigned int* sequence, unsign
         printf("Can't open file to write");
         return;
     }
-    written = fwrite(sequence, sizeof(*sequence), sequence_len, f);
-    if (written == 0) {
-        printf("Error during writing to file !");
+    for (size_t i = 0u; i < sequence_len; i++)
+    {
+        fprintf(f, "%d\n", sequence[i]);
     }
     fclose(f); 
 }
@@ -67,10 +67,9 @@ int generate_testcases()
     {
         cJSON* name = cJSON_GetObjectItem(testcase, "name");
         cJSON* total_pulses = cJSON_GetObjectItem(testcase, "total_pulses");
-        cJSON* frequency_hz = cJSON_GetObjectItem(testcase, "frequency_hz");
         cJSON* profile = cJSON_GetObjectItem(testcase, "profile");
         write_sequence_to_file(name->valuestring, 
-            generate_sequence(profile->valuestring, total_pulses->valueint, frequency_hz->valueint), 
+            generate_sequence(profile->valuestring, total_pulses->valueint), 
             total_pulses->valueint);
 
     }
@@ -79,10 +78,10 @@ int generate_testcases()
     return EXIT_SUCCESS;
 };
 
-unsigned int* generate_sequence(const char* test_profile, unsigned int total_pulses, unsigned long long frequency)
+USHORT* generate_sequence(const char* test_profile, unsigned int total_pulses)
 {
-    unsigned int* (*generate)(unsigned int, unsigned long long) = funcs[parse_profile(test_profile)];
-    return generate(total_pulses, frequency);
+    USHORT* (*generate)(unsigned int) = funcs[parse_profile(test_profile)];
+    return generate(total_pulses);
 }
 
 int main()

@@ -4,58 +4,56 @@
 #include "pulses.h"
 #include "test_profiles.h"
 
+#define USHORT unsigned short
+
 enum TestProfile parse_profile(const char* str_profile)
 {
-    if (strcmp(str_profile, "pulses_after_end"))
+    if (strcmp(str_profile, "pulses_after_end") == 0)
         return PULSES_AFTER_END;
-    if (strcmp(str_profile, "too_short_pulses"))
+    if (strcmp(str_profile, "too_short_pulses") == 0)
         return TOO_SHORT_PULSES;
-    if (strcmp(str_profile, "all"))
+    if (strcmp(str_profile, "all") == 0)
         return ALL;
     return DEFAULT;
 }
 
-unsigned int *default_generator(unsigned int total_pulses, unsigned long long frequency)
+USHORT *default_generator(unsigned int total_pulses)
 {
-    unsigned int* result;
+    USHORT* result;
     result = calloc(total_pulses, sizeof(*result));
-    result[0] = zero_pulse(frequency);
-    result[1] = one_pulse(frequency);
-    for (unsigned int i = 2u; i < total_pulses; i++)
+    unsigned short (*pulses[2])() = {&zero_pulse, &one_pulse};
+    for (size_t i = 0u; i < total_pulses; i++)
     {
-        result[i] = result[rand() % 2];
+        result[i] = pulses[rand() % 2]();
     }
-    result[total_pulses] = too_long_pulse(frequency);
+    result[total_pulses - 1] = too_long_pulse();
     return result;
 }
 
-unsigned int *pae_generator(unsigned int total_pulses, unsigned long long frequency)
+USHORT *pae_generator(unsigned int total_pulses)
 {
-    unsigned int* result = default_generator(total_pulses, frequency);
-    result[10 + rand() % (total_pulses - 10)] = result[total_pulses];
-    result[total_pulses] = result[rand() % 2];
+    USHORT* result = default_generator(total_pulses);
+    result[10 + rand() % (total_pulses - 10)] = result[total_pulses - 1];
     return result;
 }
 
-unsigned int *tsp_generator(unsigned int total_pulses, unsigned long long frequency)
+USHORT *tsp_generator(unsigned int total_pulses)
 {
-    unsigned int* result;
+    USHORT* result;
     result = calloc(total_pulses, sizeof(*result));
-    result[0] = zero_pulse(frequency);
-    result[1] = one_pulse(frequency);
-    result[2] = too_short_pulse(frequency);
-    for (unsigned int i = 3u; i < total_pulses; i++)
+    unsigned short (*pulses[3])() = {&zero_pulse, &one_pulse, &too_short_pulse};
+
+    for (size_t i = 0u; i < total_pulses; i++)
     {
-        result[i] = result[rand() % 3];
+        result[i] = pulses[rand() % 3]();
     }
-    result[total_pulses] = too_long_pulse(frequency);
+    result[total_pulses - 1] = too_long_pulse();
     return result;
 }
 
-unsigned int *all_generator(unsigned int total_pulses, unsigned long long frequency)
+USHORT *all_generator(unsigned int total_pulses)
 {
-    unsigned int* result= tsp_generator(total_pulses, frequency);
-    result[10 + rand() % (total_pulses - 10)] = result[total_pulses];
-    result[total_pulses] = result[rand() % 2];
+    USHORT* result= tsp_generator(total_pulses);
+    result[10 + rand() % (total_pulses - 10)] = result[total_pulses - 1];
     return result;
 }
