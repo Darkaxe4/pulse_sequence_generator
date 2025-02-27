@@ -1,0 +1,26 @@
+[
+    {
+        "name": "sample",
+        "total_pulses": 100,
+        "frequency_hz": 7000000,
+        "profile": "default"
+    },
+    {
+        "name": "pae_sample",
+        "total_pulses": 2000,
+        "frequency_hz": 13000000,
+        "profile": "pulses_after_end"
+    },
+    {
+        "name": "tsp_sample",
+        "total_pulses": 10000,
+        "frequency_hz": 9000000,
+        "profile": "too_short_pulses"
+    },
+    {
+        "name": "all_sample",
+        "total_pulses": 100,
+        "frequency_hz": 12500000,
+        "profile": "all"
+    }
+]
