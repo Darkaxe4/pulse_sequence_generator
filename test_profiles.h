@@ -19,9 +19,12 @@ enum TestProfile
 enum TestProfile parse_profile(const char* str_profile);
 
 
-USHORT* default_generator(unsigned int total_pulses);
-USHORT* pae_generator(unsigned int total_pulses);
-USHORT* tsp_generator(unsigned int total_pulses);
-USHORT* all_generator(unsigned int total_pulses);
+USHORT* default_generator(unsigned int total_pulses, double clock_change_probability);
+USHORT* pae_generator(unsigned int total_pulses, double clock_change_probability);
+USHORT* tsp_generator(unsigned int total_pulses, double clock_change_probability);
+USHORT* all_generator(unsigned int total_pulses, double clock_change_probability);
+
+/* generate a random floating point number from min to max */
+double randfrom(double min, double max);
 
 #endif
