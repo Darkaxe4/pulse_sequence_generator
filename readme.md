@@ -1,0 +1,1 @@
+To compile run ```gcc -o executable generator.c pulses.c test_profiles.c ./external_dependencies/cJSON.c```
