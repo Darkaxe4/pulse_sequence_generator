@@ -6,9 +6,15 @@
 #include"external_dependencies/cJSON.h"
 #include"test_profiles.h"
 
-USHORT* (*funcs[4])(unsigned int) = {&default_generator, &pae_generator, &tsp_generator, &all_generator};
+USHORT* (*funcs[4])(unsigned int, double) = {&default_generator, &pae_generator, &tsp_generator, &all_generator};
 
-USHORT* generate_sequence(const char* test_profile, unsigned int total_pulses);
+struct SequenceParameters{
+    const char* test_profile;
+    unsigned long total_pulses;
+    double clock_change_probability;
+};
+
+USHORT* generate_sequence(struct SequenceParameters* parameters);
 
 char* read_file(const char* filename)
 {
@@ -68,20 +74,29 @@ int generate_testcases()
         cJSON* name = cJSON_GetObjectItem(testcase, "name");
         cJSON* total_pulses = cJSON_GetObjectItem(testcase, "total_pulses");
         cJSON* profile = cJSON_GetObjectItem(testcase, "profile");
+        cJSON* clock_change_probability = cJSON_GetObjectItem(testcase, "clock_change_probability");
+
+        struct SequenceParameters* params;
+        params = malloc(sizeof(*params));
+        params->test_profile = profile->valuestring;
+        params->total_pulses = total_pulses->valueint;
+        params->clock_change_probability = clock_change_probability->valuedouble;
+
         write_sequence_to_file(name->valuestring, 
-            generate_sequence(profile->valuestring, total_pulses->valueint), 
+            generate_sequence(params), 
             total_pulses->valueint);
 
+        free(params);
     }
     cJSON_Delete(json);
     free(buffer);
     return EXIT_SUCCESS;
 };
 
-USHORT* generate_sequence(const char* test_profile, unsigned int total_pulses)
+USHORT* generate_sequence(struct SequenceParameters* parameters)
 {
-    USHORT* (*generate)(unsigned int) = funcs[parse_profile(test_profile)];
-    return generate(total_pulses);
+    USHORT* (*generate)(unsigned int, double) = funcs[parse_profile(parameters->test_profile)];
+    return generate(parameters->total_pulses, parameters->clock_change_probability);
 }
 
 int main()
