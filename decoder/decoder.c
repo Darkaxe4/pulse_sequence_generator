@@ -1,10 +1,21 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include<stdbool.h>
+#include<stdio.h>
+#include<stdlib.h>
 #include<string.h>
-#include <time.h>
+#include<time.h>
 
+#include"clock.h"
+#include"pulse_gen.h"
+#include"circuit.h"
 
-int* read_numbers_from_file(const char* filename, int* count) {
+void print_array(unsigned int* array, unsigned int length) {
+    for(size_t i = 0; i < length; i++) {
+        printf("%u ", array[i]);
+    }
+    printf("\n");
+}
+
+int* read_numbers_from_file(const char* filename, unsigned int* count) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         printf("Error opening file %s\n", filename);
@@ -51,7 +62,6 @@ void write_sequence_to_file(const char* filename, int* sequence, unsigned int se
     fclose(f); 
 }
 
-
 int decode_pulse(int pulse_duration) {
 
     if (pulse_duration < 7) { // 1 мкс * 7 МГц = 7 тактов
@@ -78,8 +88,30 @@ int main(int argc, char *argv[]) {
     unsigned int sequence_len = 0;
     int* sequence = read_numbers_from_file(argv[1], &sequence_len);
 
-    write_sequence_to_file("binary_sequence_out", decode_sequence(sequence, sequence_len), sequence_len);
+    if (sequence_len == 0 || sequence == NULL) {
+        printf("Error reading file\n");
+        free(sequence);
+        return 1;
+    }
+    else{
+        printf("Successfully read file\nSequence length: %d\n", sequence_len);
+        print_array(sequence, sequence_len);
+    }
 
+    struct Clock clock = {13u, 0u, 0.3, 0};
+    struct Pulse_generator gen = {sequence, sequence_len, 0u, 0u, 0, 0};
+    struct Circuit circuit = {malloc(sequence_len * sizeof(unsigned int)), 0u, 0u, 0};
+    
+    while (!gen.is_sequence_ended)
+    {
+        update_clock(&clock, 1u);
+        update_pulse_generator(&gen, 1u);
+        update_circuit(&circuit, clock.state, gen.state);
+    }
+
+    write_sequence_to_file("binary_sequence_out", decode_sequence(circuit.output_sequence, sequence_len), sequence_len);
+    printf("Successfully decoded sequence. Output is available in binary_sequence_out.txt\n");
     free(sequence);
+    free(circuit.output_sequence);
     return 0;
 }

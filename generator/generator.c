@@ -6,15 +6,14 @@
 #include"external_dependencies/cJSON.h"
 #include"test_profiles.h"
 
-USHORT* (*funcs[4])(unsigned int, double) = {&default_generator, &pae_generator, &tsp_generator, &all_generator};
+UINT* (*funcs[4])(unsigned int) = {&default_generator, &pae_generator, &tsp_generator, &all_generator};
 
 struct SequenceParameters{
     const char* test_profile;
     unsigned long total_pulses;
-    double clock_change_probability;
 };
 
-USHORT* generate_sequence(struct SequenceParameters* parameters);
+UINT* generate_sequence(struct SequenceParameters* parameters);
 
 char* read_file(const char* filename)
 {
@@ -39,7 +38,7 @@ char* read_file(const char* filename)
     return string;
 }
 
-void write_sequence_to_file(const char* filename, USHORT* sequence, unsigned int sequence_len)
+void write_sequence_to_file(const char* filename, UINT* sequence, unsigned int sequence_len)
 {
     int written = 0;
     FILE *f;
@@ -74,13 +73,11 @@ int generate_testcases()
         cJSON* name = cJSON_GetObjectItem(testcase, "name");
         cJSON* total_pulses = cJSON_GetObjectItem(testcase, "total_pulses");
         cJSON* profile = cJSON_GetObjectItem(testcase, "profile");
-        cJSON* clock_change_probability = cJSON_GetObjectItem(testcase, "clock_change_probability");
 
         struct SequenceParameters* params;
         params = malloc(sizeof(*params));
         params->test_profile = profile->valuestring;
         params->total_pulses = total_pulses->valueint;
-        params->clock_change_probability = clock_change_probability->valuedouble;
 
         write_sequence_to_file(name->valuestring, 
             generate_sequence(params), 
@@ -93,10 +90,10 @@ int generate_testcases()
     return EXIT_SUCCESS;
 };
 
-USHORT* generate_sequence(struct SequenceParameters* parameters)
+UINT* generate_sequence(struct SequenceParameters* parameters)
 {
-    USHORT* (*generate)(unsigned int, double) = funcs[parse_profile(parameters->test_profile)];
-    return generate(parameters->total_pulses, parameters->clock_change_probability);
+    UINT* (*generate)(unsigned int) = funcs[parse_profile(parameters->test_profile)];
+    return generate(parameters->total_pulses);
 }
 
 int main()

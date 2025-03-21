@@ -1,8 +1,8 @@
 #ifndef TEST_PROFILES__h
 #define TEST_PROFILES__h
 
-#ifndef USHORT
-#define USHORT unsigned short
+#ifndef UINT
+#define UINT unsigned int
 #endif
 
 enum TestProfile
@@ -19,10 +19,10 @@ enum TestProfile
 enum TestProfile parse_profile(const char* str_profile);
 
 
-USHORT* default_generator(unsigned int total_pulses, double clock_change_probability);
-USHORT* pae_generator(unsigned int total_pulses, double clock_change_probability);
-USHORT* tsp_generator(unsigned int total_pulses, double clock_change_probability);
-USHORT* all_generator(unsigned int total_pulses, double clock_change_probability);
+UINT* default_generator(unsigned int total_pulses);
+UINT* pae_generator(unsigned int total_pulses);
+UINT* tsp_generator(unsigned int total_pulses);
+UINT* all_generator(unsigned int total_pulses);
 
 /* generate a random floating point number from min to max */
 double randfrom(double min, double max);

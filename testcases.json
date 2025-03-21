@@ -2,25 +2,21 @@
     {
         "name": "sample",
         "total_pulses": 50,
-        "clock_change_probability": 0.3,
         "profile": "default"
     },
     {
         "name": "pae_sample",
         "total_pulses": 50,
-        "clock_change_probability": 0.3,
         "profile": "pulses_after_end"
     },
     {
         "name": "tsp_sample",
         "total_pulses": 50,
-        "clock_change_probability": 0.3,
         "profile": "too_short_pulses"
     },
     {
         "name": "all_sample",
         "total_pulses": 50,
-        "clock_change_probability": 0.3,
         "profile": "all"
     }
 ]
